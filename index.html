@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Calc TH Pro - เครื่องคิดเลขเสียงอัจฉริยะ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&family=Outfit:wght@400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Voice Calc <span class="accent">TH</span></h1>
+            <p>คิดเงินง่ายๆ แค่ใช้เสียงคุณ</p>
+        </header>
+
+        <main>
+            <div class="display-card">
+                <div class="card-header">
+                    <div class="status-indicator" id="status-indicator">
+                        <span class="pulse"></span>
+                        <span id="status-text">พร้อมใช้งาน</span>
+                    </div>
+                    <button id="toggle-settings" class="icon-btn" title="ตั้งค่า">⚙️</button>
+                </div>
+                
+                <div class="math-preview" id="math-preview">0 + 0</div>
+
+                <div class="transcript-container">
+                    <p id="transcript" class="transcript-text">รอฟังเสียงของคุณ...</p>
+                </div>
+
+                <div class="result-container">
+                    <div class="result-label">ผลลัพธ์สุทธิ</div>
+                    <div id="result" class="result-value">0</div>
+                    <div class="currency">บาท</div>
+                </div>
+
+                <div class="countdown-bar"><div id="delay-progress" class="progress"></div></div>
+            </div>
+
+            <div class="controls">
+                <button id="start-btn" class="btn btn-primary">
+                    <span class="icon">🎙️</span>
+                    เริ่มฟังเสียง
+                </button>
+                <div class="btn-group">
+                    <button id="reset-btn" class="btn btn-secondary">ล้างหน้าจอ</button>
+                    <button id="toggle-history" class="btn btn-secondary">ดูประวัติ</button>
+                </div>
+            </div>
+
+            <!-- Settings Panel -->
+            <section id="settings-panel" class="side-panel hidden">
+                <div class="panel-content">
+                    <div class="panel-header">
+                        <h2>⚙️ ตั้งค่า</h2>
+                        <button class="close-panel" onclick="document.getElementById('settings-panel').classList.add('hidden')">&times;</button>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label for="delay-input">หน่วงเวลาสรุปผล (วินาที):</label>
+                        <input type="number" id="delay-input" min="0" max="10" step="0.5" value="1.5">
+                        <small>แอปจะรอ X วินาทีก่อนสรุปยอด (พูดต่อได้เรื่อยๆ)</small>
+                    </div>
+
+                    <div class="setting-item">
+                        <label>สำรองและเรียกคืนข้อมูล (Backup & Restore):</label>
+                        <div class="backup-options">
+                            <label class="checkbox-label"><input type="checkbox" id="backup-settings-chk" checked> ตั้งค่า</label>
+                            <label class="checkbox-label"><input type="checkbox" id="backup-history-chk" checked> ประวัติ</label>
+                        </div>
+                        <div class="backup-actions">
+                            <button id="export-btn" class="btn btn-secondary small">📤 ส่งออกไฟล์</button>
+                            <button id="import-trigger-btn" class="btn btn-secondary small">📥 นำเข้าไฟล์</button>
+                            <input type="file" id="import-file-input" accept=".json" style="display: none;">
+                        </div>
+                        <small>ข้อมูลจะถูกเก็บเป็นไฟล์ .json บนเครื่องคุณ</small>
+                    </div>
+
+                    <div class="setting-item">
+                        <label>คำสั่งล้างจอ (Reset Keywords):</label>
+                        <input type="text" id="reset-keywords-input" placeholder="คำแยกด้วยคอมม่า เช่น เริ่มใหม่,เอาใหม่">
+                    </div>
+
+                    <div class="setting-item">
+                        <label>คำสั่งรับเงิน (Payment Keywords):</label>
+                        <input type="text" id="payment-keywords-input" placeholder="เช่น รับเงินมา,รับมา">
+                    </div>
+
+                    <div class="setting-item">
+                        <label>คำเสมือน (Aliases):</label>
+                        <div class="alias-list" id="alias-list">
+                            <!-- Alias rows injected by JS -->
+                        </div>
+                        <div class="alias-add">
+                            <input type="text" id="alias-word" placeholder="คำพูด เช่น กาแฟ">
+                            <input type="number" id="alias-value" placeholder="ราคา">
+                            <button id="add-alias-btn">+</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History Panel -->
+            <section id="history-panel" class="side-panel hidden">
+                <div class="panel-content">
+                    <div class="panel-header">
+                        <h2>📜 ประวัติการคำนวณ</h2>
+                        <button class="close-panel" onclick="document.getElementById('history-panel').classList.add('hidden')">&times;</button>
+                    </div>
+                    <div id="history-list" class="history-list">
+                        <!-- History items injected by JS -->
+                        <p class="empty-msg">ยังไม่มีประวัติการคำนวณ</p>
+                    </div>
+                    <button id="clear-history-btn" class="btn btn-danger">ล้างประวัติทั้งหมด</button>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Voice Calc Pro. Smarter Voice Billing.</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
