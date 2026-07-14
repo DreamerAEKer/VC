@@ -355,8 +355,8 @@ header p {
 }
 
 .history-time { font-size: 0.75rem; color: var(--secondary); }
-.history-exp { font-family: var(--mono); color: var(--text-dim); margin: 4px 0; }
-.history-res { font-size: 1.2rem; font-weight: 600; color: var(--text-main); }
+.history-exp { font-family: var(--mono); color: var(--text-dim); margin: 4px 0; word-break: break-all; }
+.history-res { font-size: 1.2rem; font-weight: 600; color: var(--text-main); word-break: break-all; }
 
 @media (max-width: 480px) {
     .result-value { font-size: 3.5rem; }

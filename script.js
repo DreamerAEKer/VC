@@ -23,7 +23,8 @@ let state = {
     lastCalculated: 0,
     isResuming: false,
     resetKeywords: JSON.parse(localStorage.getItem('vcalc_reset_kw')) || ['เริ่มใหม่', 'เอาใหม่', 'ใหม่'],
-    paymentKeywords: JSON.parse(localStorage.getItem('vcalc_payment_kw')) || ['รับเงินมา', 'รับมา', 'รับเงิน']
+    paymentKeywords: JSON.parse(localStorage.getItem('vcalc_payment_kw')) || ['รับเงินมา', 'รับมา', 'รับเงิน'],
+    wasListeningBeforeHistory: false
 };
 
 // Thai Logic Maps
@@ -255,6 +256,11 @@ window.resumeFromHistory = (result, exp) => {
     transcriptEl.innerText = `เริ่มต่อจาก: ${new Intl.NumberFormat('th-TH').format(result)}`;
     document.getElementById('history-panel').classList.add('hidden');
     
+    if (state.wasListeningBeforeHistory && recognition) {
+        recognition.start();
+        state.wasListeningBeforeHistory = false;
+    }
+    
     // Pulse effect to show it's loaded
     indicator.style.transform = 'scale(1.02)';
     setTimeout(() => indicator.style.transform = 'scale(1)', 200);
@@ -378,15 +384,43 @@ document.getElementById('add-alias-btn').addEventListener('click', () => {
     }
 });
 
+function closeHistoryPanel() {
+    document.getElementById('history-panel').classList.add('hidden');
+    if (state.wasListeningBeforeHistory && recognition) {
+        recognition.start();
+        state.wasListeningBeforeHistory = false;
+    }
+}
+
 toggleHistory.addEventListener('click', () => {
-    document.getElementById('history-panel').classList.toggle('hidden');
-    renderHistory();
+    const panel = document.getElementById('history-panel');
+    const isHidden = panel.classList.toggle('hidden');
+    if (!isHidden) {
+        if (state.isListening && recognition) {
+            state.wasListeningBeforeHistory = true;
+            recognition.stop();
+        } else {
+            state.wasListeningBeforeHistory = false;
+        }
+        renderHistory();
+    } else {
+        if (state.wasListeningBeforeHistory && recognition) {
+            recognition.start();
+            state.wasListeningBeforeHistory = false;
+        }
+    }
 });
+
+const closeHistoryBtn = document.getElementById('close-history-panel');
+if (closeHistoryBtn) closeHistoryBtn.addEventListener('click', closeHistoryPanel);
 
 toggleSettings.addEventListener('click', () => {
     document.getElementById('settings-panel').classList.toggle('hidden');
     renderAliases();
 });
+
+const closeSettingsBtn = document.getElementById('close-settings-panel');
+if (closeSettingsBtn) closeSettingsBtn.addEventListener('click', () => document.getElementById('settings-panel').classList.add('hidden'));
 
 startBtn.addEventListener('click', () => {
     if (state.isListening) {
